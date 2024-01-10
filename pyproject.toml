@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "redis-project"
+version = "0.1.0"
+description = "Example project using Redis."
+authors = ["Bruno Sarverry <bruno.sarverry@muttdata.ai>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+redis = "^3.5.3"
+Faker = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
