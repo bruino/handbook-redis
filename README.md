@@ -1,45 +1,45 @@
 # Redis
 
-Redis es una base de datos en memoria open source que se utiliza para almacenar estructuras de datos en memoria, caché y mensajería.
+Redis is an open-source, in-memory database used for storing data structures in memory, caching, and messaging.
 
-### Conceptos y comandos básicos
+### Concepts and Basic Commands
 
-#### Almacenamiento clave-valor:
-Redis es un sistema de almacenamiento clave-valor, lo que significa que almacena datos asociados con una clave única.
-Para almacenar un valor, puedes usar el comando SET:
+#### Key-Value Storage:
+Redis is a key-value storage system, meaning it stores data associated with a unique key.
+To store a value, you can use the SET command:
 ```sql
 SET clave valor
 ```
 
-#### Tipos de datos:
-Redis admite varios tipos de datos, incluyendo: strings, listas, conjuntos, hashes, etc.
-Algunos comandos básicos para manipular estos tipos de datos: GET, LPUSH, SADD, HSET, etc.
+#### Data types:
+Redis supports various data types, including strings, lists, sets, hashes, etc.
+Some basic commands to manipulate these data types include `GET`, `LPUSH`, `SADD`, `HSET`, etc.
 
-##### Listas:
-Puedes utilizar listas en Redis para almacenar una secuencia ordenada de elementos. Para agregar elementos a una lista, usando `LPUSH` o `RPUSH`.
+##### List:
+You can use lists in Redis to store an ordered sequence of elements. To add elements to a list, use `LPUSH` or `RPUSH`.
 ```sql
 LPUSH clave valor
 ```
 
-##### Conjuntos:
-Los conjuntos en Redis son colecciones no ordenadas de elementos únicos. Puedes agregar elementos a un conjunto utilizando SADD.
+##### Sets:
+Sets in Redis are unordered collections of unique elements. You can add elements to a set using `SADD`.
 ```sql
 SADD clave elemento
 ```
 
 ##### Hashes:
-Los hashes en Redis son mapas clave-valor. Puedes usarlos para representar objetos o estructuras de datos más complejas.
+Hashes in Redis are key-value maps. You can use them to represent more complex objects or data structures.
 ```sql
 HSET clave campo valor
 ```
 
-#### Expiración de claves:
-Puedes configurar una clave para que expire después de cierto tiempo con el comando EXPIRE.
+#### Key Expiration:
+You can set a key to expire after a certain time using the `EXPIRE` command.
 ```sql
 EXPIRE clave tiempo_en_segundos
 ```
 
-##### Ejemplos
+##### Examples
 
 - Strings:
 ```sql
@@ -76,74 +76,77 @@ ZADD estudiantes 85 "Luis"
 ZRANGE estudiantes 0 -1 WITHSCORES
 ```
 
-### Persistencia de datos:
-Redis es conocido por ser una base de datos en memoria, pero también puede persistir datos en disco si es necesario. Puedes configurar la persistencia según tus necesidades.
-Mas informacion [aqui](https://redis.io/docs/management/persistence/).
+### Data Persistence:
+Redis is known for being an in-memory database, but it can also persist data to disk if necessary. You can configure persistence according to your needs.
+More information [here](https://redis.io/docs/management/persistence/).
 
 
-ℹ️ [Documentación oficial de Redis](https://redis.io/docs/get-started/data-store/)
+ℹ️ [Oficial Docs of Redis](https://redis.io/docs/get-started/data-store/)
 
 ### RedisTimeSeries
-Es un módulo que extiende Redis para ofrecer funcionalidades específicas para series temporales.
-
-Informacion de la instalacion aqui.
+It is a module that extends Redis to provide specific functionalities for time series data.
     
-### Creación de una serie temporal:
-Para crear una serie temporal:
+### Creating a Time Series:
+To create a time series:
 ```sql
 TS.CREATE sensor_temperatura
 ```
 
-### Inserción de datos:
-Añade puntos de datos a la serie temporal utilizando `TS.ADD``. Cada punto de datos tiene un valor y una marca de tiempo.
+### Inserting Data:
+Add data points to the time series using `TS.ADD`. Each data point has a value and a timestamp.
 ```sql
 TS.ADD sensor_temperatura 1548149181 25.5
 TS.ADD sensor_temperatura 1548149241 26.0
 ```
 
-### Consulta de datos:
-Puedes recuperar datos de la serie temporal utilizando comandos como TS.RANGE para obtener un rango de puntos de datos.
+### Querying Data:
+You can retrieve data from the time series using commands like `TS.RANGE` to get a range of data points.
 ```sql
 TS.RANGE sensor_temperatura 1548149000 1548149300
 ```
 
-### Agregaciones:
-RedisTimeSeries admite agregaciones para resumir datos en intervalos de tiempo específicos usando `TS.RANGE`
+### Aggregations:
+RedisTimeSeries supports aggregations to summarize data in specific time intervals using `TS.RANGE`.
 ```sql
 TS.RANGE sensor_temperatura 1548149000 1548150000 AGGREGATION avg 10
 
 ```
 
-### Reducción de la resolución:
-Puedes reducir la resolución de una serie temporal usando `TS.REDUCE` para agrupar puntos de datos.
-
+### Reducing Resolution:
+You can reduce the resolution of a time series using `TS.REDUCE` to group data points.
 ```sql
 TS.REDUCE sensor_temperatura MAX 10
 ```
 
 ### Labels:
-Puedes agregar etiquetas a las series temporales para organizar y etiquetar tus datos:
+You can add labels to time series to organize and tag your data:
 ```sql
 TS.ALTER sensor_temperatura LABELS sensor "sala"
 ```
 
-### Configuración de retención:
-Se puede establecer una política de retención para limitar la cantidad de datos almacenados en la serie temporal.
-
+### Retention Policy Configuration:
+You can set a retention policy to limit the amount of data stored in the time series.
 ```sql
 TS.CREATE sensor_temperatura RETENTION 3600
 ```
 
-Documentación oficial de RedisTimeSeries.
+Official documentation for [RedisTimeSeries](https://redis.io/docs/data-types/timeseries/).
 
 
-## Proyecto - Sensor de Temperatura/Humedad
+## Exmaple Project - Temperature/Humidity Sensor
+n this repository, there is a script that generates random humidity and temperature values stored in Redis every second.
 
-En el presente repo hay un script generador de valores aleatorios de humedad y temperatura que se almacenan en Redis cada segundo.
-
-Para iniciar el proyecto:
+To start the project:
 ```bash
 docker-compose up -d
 ```
+The data will be persisted, and you can access it in the root of the repository in the data.ignore/ folder.
 
-Los datos seran persistidos y podras accederlos en la raiz del repositorio en la carpeta `data.ignore/`.
+You can access the Redis client and execute the corresponding queries for this data:
+```bash
+% docker exec -it redis-db /bin/bash
+root@c2e364f48c2c:/# redis-cli
+127.0.0.1:6379> TS.GET sensor_data_channel
+```
+
+We use the official Docker image `redis/redis-stack-server`, which includes all the extra modules (in this case, the Time Series module) out of the box, allowing us to use it with zero configurations.
