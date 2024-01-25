@@ -2,15 +2,32 @@ version: '3'
 services:
   redis:
     image: "redis/redis-stack-server:latest"
+    container_name: redis-db
     ports:
       - 6379:6379
+    command:
+      [
+        "redis-server",
+        "--loadmodule",
+        "/opt/redis-stack/lib/redistimeseries.so",
+        "--timeout",
+        "120",
+        "--save",
+        "60",
+        "1",
+        "--protected-mode no"
+      ]
+    volumes:
+      - ./data.ignore/redis:/data/
     networks:
       - mynetwork
 
   sensor-generator:
     build:
       context: .
-    command: bash -c "ls -la && poetry run python /app/sensor-generator.py"
+    command: bash -c "poetry run python sensor-generator.py"
+    volumes:
+      - ./sensor-generator.py:/app/sensor-generator.py
     depends_on:
       - redis
     networks:
